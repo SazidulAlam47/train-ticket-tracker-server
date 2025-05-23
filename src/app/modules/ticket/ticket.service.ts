@@ -6,6 +6,7 @@ import {
     TSearchTicketPayload,
 } from './ticket.interface';
 import capitalize from '../../utils/capitalize';
+import config from '../../config';
 
 const searchTickets = async (payload: TSearchTicketPayload) => {
     const fromCity = payload.from.trim().replace(/ /g, '%20');
@@ -19,7 +20,7 @@ const searchTickets = async (payload: TSearchTicketPayload) => {
         .replace(/ /g, '-');
 
     const axiosResponse = await axios.get(
-        `https://railspaapi.shohoz.com/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
+        `${config.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
     );
 
     const apiResponse = axiosResponse.data as IApiResponse;
