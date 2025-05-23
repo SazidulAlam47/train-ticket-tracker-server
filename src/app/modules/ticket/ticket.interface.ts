@@ -69,3 +69,19 @@ export interface BoardingPoint {
 export type TSearchTicketPayload = z.infer<
     typeof TicketValidations.searchTickets
 >;
+
+export interface ISeatsResponse {
+    class: string;
+    fare: string;
+    seatCount: number;
+}
+
+export interface ITrainResponse {
+    trainName: string;
+    departureDateTime: string;
+    arrivalDateTime: string;
+    travelTime: string;
+    originCity: string;
+    destinationCity: string;
+    seats: ISeatsResponse[];
+}

@@ -1,5 +1,10 @@
 import axios from 'axios';
-import { IApiResponse, TSearchTicketPayload } from './ticket.interface';
+import {
+    IApiResponse,
+    ISeatsResponse,
+    ITrainResponse,
+    TSearchTicketPayload,
+} from './ticket.interface';
 import capitalize from '../../utils/capitalize';
 
 const searchTickets = async (payload: TSearchTicketPayload) => {
@@ -19,19 +24,40 @@ const searchTickets = async (payload: TSearchTicketPayload) => {
 
     const apiResponse = axiosResponse.data as IApiResponse;
 
-    const result = apiResponse.data.trains.map((train) => ({
-        trainName: train.trip_number,
-        departureDateTime: train.departure_date_time,
-        arrivalDateTime: train.arrival_date_time,
-        travelTime: train.travel_time,
-        originCity: capitalize(train.origin_city_name),
-        destinationCity: capitalize(train.destination_city_name),
-        classes: train.seat_types.map((seat) => ({
-            class: seat.type,
-            fare: seat.fare,
-            seatCount: seat.seat_counts.online + seat.seat_counts.offline,
-        })),
-    }));
+    const result = apiResponse.data.trains.reduce(
+        (acc: ITrainResponse[], curr) => {
+            const trainData = {
+                trainName: curr.trip_number,
+                departureDateTime: curr.departure_date_time,
+                arrivalDateTime: curr.arrival_date_time,
+                travelTime: curr.travel_time,
+                originCity: capitalize(curr.origin_city_name),
+                destinationCity: capitalize(curr.destination_city_name),
+                seats: curr.seat_types.reduce(
+                    (accS: ISeatsResponse[], currS) => {
+                        const seatCount =
+                            currS.seat_counts.online +
+                            currS.seat_counts.offline;
+                        if (seatCount) {
+                            accS.push({
+                                class: currS.type,
+                                fare: currS.fare,
+                                seatCount,
+                            });
+                        }
+                        return accS;
+                    },
+                    [],
+                ),
+            };
+
+            if (trainData.seats.length) {
+                acc.push(trainData);
+            }
+            return acc;
+        },
+        [],
+    );
 
     return result;
 };
