@@ -137,3 +137,6 @@ dist
 
 # pnpm
 pnpm-lock.yaml
+
+#vscode
+.vscode
