@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TicketServices = void 0;
 const axios_1 = __importDefault(require("axios"));
 const capitalize_1 = __importDefault(require("../../utils/capitalize"));
+const config_1 = __importDefault(require("../../config"));
 const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const fromCity = payload.from.trim().replace(/ /g, '%20');
     const toCity = payload.to.trim().replace(/ /g, '%20');
@@ -25,7 +26,7 @@ const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* (
         year: 'numeric',
     })
         .replace(/ /g, '-');
-    const axiosResponse = yield axios_1.default.get(`https://railspaapi.shohoz.com/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`);
+    const axiosResponse = yield axios_1.default.get(`${config_1.default.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`);
     const apiResponse = axiosResponse.data;
     const result = apiResponse.data.trains.reduce((acc, curr) => {
         const trainData = {
