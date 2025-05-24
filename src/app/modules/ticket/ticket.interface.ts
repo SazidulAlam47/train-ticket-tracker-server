@@ -72,7 +72,7 @@ export type TSearchTicketPayload = z.infer<
 
 export interface ISeatsResponse {
     class: string;
-    fare: string;
+    fare: number;
     seatCount: number;
 }
 
@@ -85,3 +85,17 @@ export interface ITrainResponse {
     destinationCity: string;
     seats: ISeatsResponse[];
 }
+
+export type TFormattedResponse = {
+    trainName: string;
+    departureDateTime: string;
+    arrivalDateTime: string;
+    travelTime: string;
+    from: string;
+    to: string;
+    class: string;
+    fare: number;
+    seats: number;
+    now: Date;
+    link: string;
+}[];

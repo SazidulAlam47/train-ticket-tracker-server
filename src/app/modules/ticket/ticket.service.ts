@@ -3,6 +3,7 @@ import {
     IApiResponse,
     ISeatsResponse,
     ITrainResponse,
+    TFormattedResponse,
     TSearchTicketPayload,
 } from './ticket.interface';
 import capitalize from '../../utils/capitalize';
@@ -25,7 +26,7 @@ const searchTickets = async (payload: TSearchTicketPayload) => {
 
     const apiResponse = axiosResponse.data as IApiResponse;
 
-    const result = apiResponse.data.trains.reduce(
+    const availableTicketData = apiResponse.data.trains.reduce(
         (acc: ITrainResponse[], curr) => {
             const trainData = {
                 trainName: curr.trip_number,
@@ -42,7 +43,7 @@ const searchTickets = async (payload: TSearchTicketPayload) => {
                         if (seatCount) {
                             accS.push({
                                 class: currS.type,
-                                fare: currS.fare,
+                                fare: Number(currS.fare),
                                 seatCount,
                             });
                         }
@@ -60,7 +61,27 @@ const searchTickets = async (payload: TSearchTicketPayload) => {
         [],
     );
 
-    return result;
+    const formattedResponse: TFormattedResponse = [];
+
+    availableTicketData.forEach((ticket) => {
+        ticket.seats.forEach((seat) => {
+            formattedResponse.push({
+                trainName: ticket.trainName,
+                departureDateTime: ticket.departureDateTime,
+                arrivalDateTime: ticket.arrivalDateTime,
+                travelTime: ticket.travelTime,
+                from: ticket.originCity,
+                to: ticket.destinationCity,
+                class: seat.class,
+                fare: seat.fare,
+                seats: seat.seatCount,
+                now: new Date(),
+                link: `https://eticket.railway.gov.bd/booking/train/search?fromcity=${fromCity}&tocity=${toCity}&doj=${date}&class=${seat.class}`,
+            });
+        });
+    });
+
+    return formattedResponse;
 };
 
 export const TicketServices = {
