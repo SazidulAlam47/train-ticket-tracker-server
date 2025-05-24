@@ -28,7 +28,7 @@ const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* (
         .replace(/ /g, '-');
     const axiosResponse = yield axios_1.default.get(`${config_1.default.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`);
     const apiResponse = axiosResponse.data;
-    const result = apiResponse.data.trains.reduce((acc, curr) => {
+    const availableTicketData = apiResponse.data.trains.reduce((acc, curr) => {
         const trainData = {
             trainName: curr.trip_number,
             departureDateTime: curr.departure_date_time,
@@ -42,7 +42,7 @@ const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* (
                 if (seatCount) {
                     accS.push({
                         class: currS.type,
-                        fare: currS.fare,
+                        fare: Number(currS.fare),
                         seatCount,
                     });
                 }
@@ -54,7 +54,25 @@ const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* (
         }
         return acc;
     }, []);
-    return result;
+    const formattedResponse = [];
+    availableTicketData.forEach((ticket) => {
+        ticket.seats.forEach((seat) => {
+            formattedResponse.push({
+                trainName: ticket.trainName,
+                departureDateTime: ticket.departureDateTime,
+                arrivalDateTime: ticket.arrivalDateTime,
+                travelTime: ticket.travelTime,
+                from: ticket.originCity,
+                to: ticket.destinationCity,
+                class: seat.class,
+                fare: seat.fare,
+                seats: seat.seatCount,
+                now: new Date(),
+                link: `https://eticket.railway.gov.bd/booking/train/search?fromcity=${fromCity}&tocity=${toCity}&doj=${date}&class=${seat.class}`,
+            });
+        });
+    });
+    return formattedResponse;
 });
 exports.TicketServices = {
     searchTickets,
