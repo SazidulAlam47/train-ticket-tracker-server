@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { TicketValidations } from './ticket.validation';
 
-export interface IApiResponse {
+export interface IShohozApiResponse {
     data: Data;
 }
 
@@ -70,23 +70,7 @@ export type TSearchTicketPayload = z.infer<
     typeof TicketValidations.searchTickets
 >;
 
-export interface ISeatsResponse {
-    class: string;
-    fare: number;
-    seatCount: number;
-}
-
-export interface ITrainResponse {
-    trainName: string;
-    departureDateTime: string;
-    arrivalDateTime: string;
-    travelTime: string;
-    originCity: string;
-    destinationCity: string;
-    seats: ISeatsResponse[];
-}
-
-export type TFormattedResponse = {
+export type TMyResponse = {
     trainName: string;
     departureDateTime: string;
     arrivalDateTime: string;

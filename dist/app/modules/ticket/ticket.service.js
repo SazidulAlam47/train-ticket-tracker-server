@@ -28,51 +28,34 @@ const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* (
         .replace(/ /g, '-');
     const axiosResponse = yield axios_1.default.get(`${config_1.default.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`);
     const apiResponse = axiosResponse.data;
-    const availableTicketData = apiResponse.data.trains.reduce((acc, curr) => {
-        const trainData = {
-            trainName: curr.trip_number,
-            departureDateTime: curr.departure_date_time,
-            arrivalDateTime: curr.arrival_date_time,
-            travelTime: curr.travel_time,
-            originCity: (0, capitalize_1.default)(curr.origin_city_name),
-            destinationCity: (0, capitalize_1.default)(curr.destination_city_name),
-            seats: curr.seat_types.reduce((accS, currS) => {
-                const seatCount = currS.seat_counts.online +
-                    currS.seat_counts.offline;
-                if (seatCount) {
-                    accS.push({
-                        class: currS.type,
-                        fare: Number(currS.fare),
-                        seatCount,
-                    });
-                }
-                return accS;
-            }, []),
-        };
-        if (trainData.seats.length) {
-            acc.push(trainData);
-        }
+    const result = apiResponse.data.trains.reduce((acc, curr) => {
+        const trainName = curr.trip_number;
+        const departureDateTime = curr.departure_date_time;
+        const arrivalDateTime = curr.arrival_date_time;
+        const travelTime = curr.travel_time;
+        const from = (0, capitalize_1.default)(curr.origin_city_name);
+        const to = (0, capitalize_1.default)(curr.destination_city_name);
+        curr.seat_types.forEach((seat) => {
+            const seatCount = seat.seat_counts.online + seat.seat_counts.offline;
+            if (seatCount) {
+                acc.push({
+                    trainName,
+                    departureDateTime,
+                    arrivalDateTime,
+                    travelTime,
+                    from,
+                    to,
+                    class: seat.type,
+                    fare: Number(seat.fare),
+                    seats: seatCount,
+                    now: new Date(),
+                    link: `https://eticket.railway.gov.bd/booking/train/search?fromcity=${fromCity}&tocity=${toCity}&doj=${date}&class=${seat.type}`,
+                });
+            }
+        });
         return acc;
     }, []);
-    const formattedResponse = [];
-    availableTicketData.forEach((ticket) => {
-        ticket.seats.forEach((seat) => {
-            formattedResponse.push({
-                trainName: ticket.trainName,
-                departureDateTime: ticket.departureDateTime,
-                arrivalDateTime: ticket.arrivalDateTime,
-                travelTime: ticket.travelTime,
-                from: ticket.originCity,
-                to: ticket.destinationCity,
-                class: seat.class,
-                fare: seat.fare,
-                seats: seat.seatCount,
-                now: new Date(),
-                link: `https://eticket.railway.gov.bd/booking/train/search?fromcity=${fromCity}&tocity=${toCity}&doj=${date}&class=${seat.class}`,
-            });
-        });
-    });
-    return formattedResponse;
+    return result;
 });
 exports.TicketServices = {
     searchTickets,
