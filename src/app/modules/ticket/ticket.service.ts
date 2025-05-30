@@ -22,9 +22,9 @@ const searchTickets = async (payload: TSearchTicketPayload) => {
         `${config.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
     );
 
-    const apiResponse = axiosResponse.data as IShohozApiResponse;
+    const shohozApiResponse = axiosResponse.data as IShohozApiResponse;
 
-    const result: TMyResponse = apiResponse.data.trains.reduce(
+    const result = shohozApiResponse.data.trains.reduce(
         (acc: TMyResponse, curr) => {
             const trainName = curr.trip_number;
             const departureDateTime = curr.departure_date_time;
