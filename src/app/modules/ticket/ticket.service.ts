@@ -6,6 +6,8 @@ import {
 } from './ticket.interface';
 import capitalize from '../../utils/capitalize';
 import config from '../../config';
+import ApiError from '../../errors/ApiError';
+import status from 'http-status';
 
 const searchTickets = async (payload: TSearchTicketPayload) => {
     const fromCity = payload.from.trim().replace(/ /g, '%20');
@@ -23,6 +25,13 @@ const searchTickets = async (payload: TSearchTicketPayload) => {
     );
 
     const shohozApiResponse = axiosResponse.data as IShohozApiResponse;
+
+    if (!shohozApiResponse.data.trains.length) {
+        throw new ApiError(
+            status.NOT_FOUND,
+            'No train found for selected dates or cities',
+        );
+    }
 
     const result = shohozApiResponse.data.trains.reduce(
         (acc: TMyResponse, curr) => {
