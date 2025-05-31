@@ -16,6 +16,8 @@ exports.TicketServices = void 0;
 const axios_1 = __importDefault(require("axios"));
 const capitalize_1 = __importDefault(require("../../utils/capitalize"));
 const config_1 = __importDefault(require("../../config"));
+const ApiError_1 = __importDefault(require("../../errors/ApiError"));
+const http_status_1 = __importDefault(require("http-status"));
 const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const fromCity = payload.from.trim().replace(/ /g, '%20');
     const toCity = payload.to.trim().replace(/ /g, '%20');
@@ -27,8 +29,11 @@ const searchTickets = (payload) => __awaiter(void 0, void 0, void 0, function* (
     })
         .replace(/ /g, '-');
     const axiosResponse = yield axios_1.default.get(`${config_1.default.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`);
-    const apiResponse = axiosResponse.data;
-    const result = apiResponse.data.trains.reduce((acc, curr) => {
+    const shohozApiResponse = axiosResponse.data;
+    if (!shohozApiResponse.data.trains.length) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'No train found for selected dates or cities');
+    }
+    const result = shohozApiResponse.data.trains.reduce((acc, curr) => {
         const trainName = curr.trip_number;
         const departureDateTime = curr.departure_date_time;
         const arrivalDateTime = curr.arrival_date_time;
