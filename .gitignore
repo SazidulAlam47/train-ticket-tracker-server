@@ -140,3 +140,6 @@ pnpm-lock.yaml
 
 #vscode
 .vscode
+
+#build files
+dist
