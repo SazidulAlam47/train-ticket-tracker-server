@@ -11,13 +11,29 @@ import formatDateError from '../../utils/formatDateError';
 import formatDateShohoz from '../../utils/formatDateShohoz';
 import formatStationNameShohoz from '../../utils/formatStationNameShohoz';
 
-const searchTickets = async (payload: TSearchTicketPayload) => {
+const searchTickets = async (
+    payload: TSearchTicketPayload,
+    tokenBearer: string | undefined,
+) => {
+    if (!tokenBearer) {
+        throw new ApiError(status.UNAUTHORIZED, 'You are not authorized');
+    }
+    const token = tokenBearer.split(' ')[1];
+    if (!token) {
+        throw new ApiError(status.UNAUTHORIZED, 'You are not authorized');
+    }
+
     const fromCity = formatStationNameShohoz(payload.from);
     const toCity = formatStationNameShohoz(payload.to);
     const date = formatDateShohoz(payload.date);
 
     const axiosResponse = await axios.get(
         `${config.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        },
     );
 
     const shohozApiResponse = axiosResponse.data as IShohozApiResponse;

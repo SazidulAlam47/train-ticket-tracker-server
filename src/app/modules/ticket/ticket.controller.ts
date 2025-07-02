@@ -4,7 +4,8 @@ import sendResponse from '../../utils/sendResponse';
 import { TicketServices } from './ticket.service';
 
 const searchTickets = catchAsync(async (req, res) => {
-    const result = await TicketServices.searchTickets(req.body);
+    const tokenBearer = req.headers.authorization;
+    const result = await TicketServices.searchTickets(req.body, tokenBearer);
     sendResponse(res, {
         statusCode: status.OK,
         message: 'Tickets are fetched successfully',
