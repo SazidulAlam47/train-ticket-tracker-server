@@ -2,6 +2,7 @@
 import { Server } from 'http';
 import app from './app';
 import config from './app/config';
+import mongoose from 'mongoose';
 
 const port = Number(config.port);
 
@@ -9,6 +10,8 @@ let server: Server;
 
 async function main() {
     try {
+        await mongoose.connect(config.database_url as string);
+
         server = app.listen(port, () => {
             console.log(
                 'Train Ticket Tracker Server is listening on port',

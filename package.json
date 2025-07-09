@@ -21,6 +21,7 @@
         "express": "^5.1.0",
         "http-status": "^2.1.0",
         "luxon": "^3.6.1",
+        "mongoose": "^8.16.2",
         "zod": "^3.25.23"
     },
     "devDependencies": {
@@ -28,6 +29,7 @@
         "@types/cors": "^2.8.18",
         "@types/express": "^5.0.2",
         "@types/luxon": "^3.6.2",
+        "@types/mongoose": "^5.11.97",
         "@typescript-eslint/eslint-plugin": "^8.32.1",
         "@typescript-eslint/parser": "^8.32.1",
         "eslint": "^9.27.0",

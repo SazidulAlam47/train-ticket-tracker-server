@@ -3,9 +3,8 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { TicketServices } from './ticket.service';
 
-const searchTickets = catchAsync(async (req, res) => {
-    const tokenBearer = req.headers.authorization;
-    const result = await TicketServices.searchTickets(req.body, tokenBearer);
+const searchTicketsWithAuth = catchAsync(async (req, res) => {
+    const result = await TicketServices.searchTicketsWithAuth(req.body);
     sendResponse(res, {
         statusCode: status.OK,
         message: 'Tickets are fetched successfully',
@@ -14,5 +13,5 @@ const searchTickets = catchAsync(async (req, res) => {
 });
 
 export const TicketControllers = {
-    searchTickets,
+    searchTicketsWithAuth,
 };

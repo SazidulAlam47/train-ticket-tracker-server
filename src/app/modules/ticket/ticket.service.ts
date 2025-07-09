@@ -1,34 +1,33 @@
-import axios from 'axios';
 import {
     IShohozApiResponse,
     TMyResponse,
     TSearchTicketPayload,
 } from './ticket.interface';
-import config from '../../config';
 import ApiError from '../../errors/ApiError';
 import status from 'http-status';
 import formatDateError from '../../utils/formatDateError';
 import formatDateShohoz from '../../utils/formatDateShohoz';
 import formatStationNameShohoz from '../../utils/formatStationNameShohoz';
+import axiosInstance from '../../helpers/axiosInstance';
+import { UserServices } from '../user/user.service';
 
-const searchTickets = async (
-    payload: TSearchTicketPayload,
-    tokenBearer: string | undefined,
-) => {
-    if (!tokenBearer) {
-        throw new ApiError(status.UNAUTHORIZED, 'You are not authorized');
+const searchTicketsWithAuth = async (payload: TSearchTicketPayload) => {
+    try {
+        const oldToken = await UserServices.getTokenFromDB();
+        return await searchTickets(payload, oldToken);
+    } catch {
+        const newToken = await UserServices.loginToGetNewToken();
+        return await searchTickets(payload, newToken);
     }
-    const token = tokenBearer.split(' ')[1];
-    if (!token) {
-        throw new ApiError(status.UNAUTHORIZED, 'You are not authorized');
-    }
+};
 
+const searchTickets = async (payload: TSearchTicketPayload, token: string) => {
     const fromCity = formatStationNameShohoz(payload.from);
     const toCity = formatStationNameShohoz(payload.to);
     const date = formatDateShohoz(payload.date);
 
-    const axiosResponse = await axios.get(
-        `${config.shohoz_base_api}/v1.0/web/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
+    const axiosResponse = await axiosInstance.get(
+        `/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
         {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -36,7 +35,7 @@ const searchTickets = async (
         },
     );
 
-    const shohozApiResponse = axiosResponse.data as IShohozApiResponse;
+    const shohozApiResponse = axiosResponse?.data as IShohozApiResponse;
 
     if (!shohozApiResponse?.data?.trains?.length) {
         throw new ApiError(
@@ -84,4 +83,5 @@ const searchTickets = async (
 
 export const TicketServices = {
     searchTickets,
+    searchTicketsWithAuth,
 };
