@@ -67,7 +67,7 @@ export interface BoardingPoint {
 }
 
 export type TSearchTicketPayload = z.infer<
-    typeof TicketValidations.searchTickets
+    typeof TicketValidations.searchTicketsWithAuth
 >;
 
 export type TMyResponse = {
