@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     IShohozApiResponse,
     TMyResponse,
@@ -15,9 +16,13 @@ const searchTicketsWithAuth = async (payload: TSearchTicketPayload) => {
     try {
         const oldToken = await UserServices.getTokenFromDB();
         return await searchTickets(payload, oldToken);
-    } catch {
-        const newToken = await UserServices.loginToGetNewToken();
-        return await searchTickets(payload, newToken);
+    } catch (err: any) {
+        if (err.statusCode === status.UNAUTHORIZED) {
+            const newToken = await UserServices.loginToGetNewToken();
+            return await searchTickets(payload, newToken);
+        } else {
+            throw new ApiError(err.statusCode, err.message);
+        }
     }
 };
 
@@ -26,16 +31,21 @@ const searchTickets = async (payload: TSearchTicketPayload, token: string) => {
     const toCity = formatStationNameShohoz(payload.to);
     const date = formatDateShohoz(payload.date);
 
-    const axiosResponse = await axiosInstance.get(
-        `/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
+    let axiosResponse;
+    try {
+        axiosResponse = await axiosInstance.get(
+            `/bookings/search-trips-v2?from_city=${fromCity}&to_city=${toCity}&date_of_journey=${date}&seat_class=S_CHAIR`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             },
-        },
-    );
+        );
+    } catch (err: any) {
+        throw new ApiError(err.status, err.message);
+    }
 
-    const shohozApiResponse = axiosResponse?.data as IShohozApiResponse;
+    const shohozApiResponse = axiosResponse.data as IShohozApiResponse;
 
     if (!shohozApiResponse?.data?.trains?.length) {
         throw new ApiError(

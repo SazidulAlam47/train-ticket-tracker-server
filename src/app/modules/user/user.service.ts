@@ -16,7 +16,7 @@ const loginToGetNewToken = async () => {
     const token = axiosResponse?.data?.data?.token as string;
 
     if (!token) {
-        throw new ApiError(status.UNAUTHORIZED, 'Token not found');
+        throw new ApiError(status.UNAUTHORIZED, 'You are unauthorized');
     }
 
     const user = await User.findOne({ mobileNumber: config.account_number });
@@ -37,7 +37,7 @@ const getTokenFromDB = async () => {
     const user = await User.findOne({ mobileNumber: config.account_number });
 
     if (!user) {
-        throw new ApiError(status.NOT_FOUND, 'User not found');
+        throw new ApiError(status.UNAUTHORIZED, 'User not found');
     }
 
     return user.token;
