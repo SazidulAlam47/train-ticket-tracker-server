@@ -3,11 +3,16 @@ import cors from 'cors';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routes';
+import config from './app/config';
 
 const app: Application = express();
 
 //middleware
-app.use(cors());
+app.use(
+    cors({
+        origin: config.client_url,
+    }),
+);
 app.use(express.json());
 
 const test = (req: Request, res: Response) => {
