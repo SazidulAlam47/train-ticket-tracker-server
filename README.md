@@ -2,6 +2,48 @@
 
 A lightweight proxy server for the Shohoz API exclusively designed to fetch and serve train ticket data. This backend does not store or manage data itself; it simply relays requests and responses between clients and the official Shohoz API.
 
+## Installation
+
+Follow these steps to run the server locally:
+
+1. **Clone the repository** (if you haven't already):
+
+    ```sh
+    git clone https://github.com/SazidulAlam47/train-ticket-tracker-server.git
+    cd train-ticket-tracker-server
+    ```
+
+2. **Install dependencies:**
+
+    ```sh
+    npm install
+    ```
+
+3. **Configure environment variables:**
+    - Copy `.env.example` to `.env` and fill in your credentials:
+
+    ```sh
+     cp .env.example .env
+    ```
+
+    After copying `.env.example` to `.env`, configure the following variables in your `.env` file:
+
+    ```ini
+    # PORT: The port number the server will run on (default: 5000)
+    # DATABASE_URL: MongoDB connection string
+    # SHOHOZ_BASE_API: Shohoz API base URL
+    # CLIENT_URL: Allowed client URL for CORS
+    # ACCOUNT_NUMBER: Your Shohoz account number
+    # ACCOUNT_PASS: Your Shohoz account password
+    ```
+
+4. **Start the server:**
+    ```sh
+    npm start
+    ```
+
+The server will run on the port specified in your `.env` file (default: 5000).
+
 ## Overview
 
 - **Purpose:** Acts as a middleware between your frontend/client and the Shohoz API, forwarding requests to retrieve train ticket information.
