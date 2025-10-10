@@ -29,7 +29,13 @@ const getUserProfile = async (
 
     const shohozApiResponse = axiosResponse.data;
 
-    return shohozApiResponse;
+    const result = {
+        name: shohozApiResponse?.data?.display_name,
+        email: shohozApiResponse?.data?.email,
+        phone: shohozApiResponse?.data?.phone_number,
+    };
+
+    return result;
 };
 
 export const UserServices = {
