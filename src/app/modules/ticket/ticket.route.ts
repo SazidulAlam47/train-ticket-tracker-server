@@ -7,8 +7,8 @@ const router = express.Router();
 
 router.post(
     '/',
-    validateRequest(TicketValidations.searchTicketsWithAuth),
-    TicketControllers.searchTicketsWithAuth,
+    validateRequest(TicketValidations.searchTickets),
+    TicketControllers.searchTickets,
 );
 
 export const TicketRoutes = router;

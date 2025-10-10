@@ -10,23 +10,18 @@ import formatDateError from '../../utils/formatDateError';
 import formatDateShohoz from '../../utils/formatDateShohoz';
 import formatStationNameShohoz from '../../utils/formatStationNameShohoz';
 import axiosInstance from '../../helpers/axiosInstance';
-import { UserServices } from '../user/user.service';
 
-const searchTicketsWithAuth = async (payload: TSearchTicketPayload) => {
-    try {
-        const oldToken = await UserServices.getTokenFromDB();
-        return await searchTickets(payload, oldToken);
-    } catch (err: any) {
-        if (err.statusCode === status.UNAUTHORIZED) {
-            const newToken = await UserServices.loginToGetNewToken();
-            return await searchTickets(payload, newToken);
-        } else {
-            throw new ApiError(err.statusCode, err.message);
-        }
+const searchTickets = async (
+    payload: TSearchTicketPayload,
+    token: string | undefined,
+    ssdk: string | undefined,
+    uudid: string | undefined,
+    xRequestedWith: string | undefined,
+) => {
+    if (!token || !ssdk || !uudid || !xRequestedWith) {
+        throw new ApiError(status.UNAUTHORIZED, 'Unauthorized access');
     }
-};
 
-const searchTickets = async (payload: TSearchTicketPayload, token: string) => {
     const fromCity = formatStationNameShohoz(payload.from);
     const toCity = formatStationNameShohoz(payload.to);
     const date = formatDateShohoz(payload.date);
@@ -38,6 +33,9 @@ const searchTickets = async (payload: TSearchTicketPayload, token: string) => {
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
+                    'x-device-key': ssdk,
+                    'x-device-id': uudid,
+                    'x-requested-with': xRequestedWith,
                 },
             },
         );
@@ -93,5 +91,4 @@ const searchTickets = async (payload: TSearchTicketPayload, token: string) => {
 
 export const TicketServices = {
     searchTickets,
-    searchTicketsWithAuth,
 };

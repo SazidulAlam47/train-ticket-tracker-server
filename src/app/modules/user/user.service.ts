@@ -1,49 +1,37 @@
-import { TLoginPayload } from './user.interface';
-import axiosInstance from '../../helpers/axiosInstance';
-import ApiError from '../../errors/ApiError';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
-import { User } from './user.model';
-import config from '../../config';
+import ApiError from '../../errors/ApiError';
+import axiosInstance from '../../helpers/axiosInstance';
 
-const loginToGetNewToken = async () => {
-    const payload: TLoginPayload = {
-        mobile_number: config.account_number,
-        password: config.account_pass,
-    };
-
-    const axiosResponse = await axiosInstance.post('/auth/sign-in', payload);
-
-    const token = axiosResponse?.data?.data?.token as string;
-
-    if (!token) {
-        throw new ApiError(status.UNAUTHORIZED, 'You are unauthorized');
+const getUserProfile = async (
+    token: string | undefined,
+    ssdk: string | undefined,
+    uudid: string | undefined,
+    xRequestedWith: string | undefined,
+) => {
+    if (!token || !ssdk || !uudid || !xRequestedWith) {
+        throw new ApiError(status.UNAUTHORIZED, 'Unauthorized access');
     }
 
-    const user = await User.findOne({ mobileNumber: config.account_number });
-
-    if (user) {
-        await User.findOneAndUpdate(
-            { mobileNumber: config.account_number },
-            { mobileNumber: config.account_number, token },
-        );
-    } else {
-        await User.create({ mobileNumber: config.account_number, token });
+    let axiosResponse;
+    try {
+        axiosResponse = await axiosInstance.get(`/auth/profile`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'x-device-key': ssdk,
+                'x-device-id': uudid,
+                'x-requested-with': xRequestedWith,
+            },
+        });
+    } catch (err: any) {
+        throw new ApiError(err.status, err.message);
     }
 
-    return token;
-};
+    const shohozApiResponse = axiosResponse.data;
 
-const getTokenFromDB = async () => {
-    const user = await User.findOne({ mobileNumber: config.account_number });
-
-    if (!user) {
-        throw new ApiError(status.UNAUTHORIZED, 'User not found');
-    }
-
-    return user.token;
+    return shohozApiResponse;
 };
 
 export const UserServices = {
-    loginToGetNewToken,
-    getTokenFromDB,
+    getUserProfile,
 };

@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { z } from 'zod';
 
-const searchTicketsWithAuth = z.object({
+const searchTickets = z.object({
     from: z.string(),
     to: z.string(),
     date: z
@@ -27,5 +27,5 @@ const searchTicketsWithAuth = z.object({
 });
 
 export const TicketValidations = {
-    searchTicketsWithAuth,
+    searchTickets,
 };
