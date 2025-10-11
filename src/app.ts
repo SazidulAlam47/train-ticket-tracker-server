@@ -21,7 +21,6 @@ const test = (req: Request, res: Response) => {
 
 // test route
 app.get('/', test);
-app.get('/api/v1/test', test);
 
 // application routes
 app.use('/api/v1', router);

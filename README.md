@@ -30,11 +30,8 @@ Follow these steps to run the server locally:
 
     ```ini
     # PORT: The port number the server will run on (default: 5000)
-    # DATABASE_URL: MongoDB connection string
     # SHOHOZ_BASE_API: Shohoz API base URL
     # CLIENT_URL: Allowed client URL for CORS
-    # ACCOUNT_NUMBER: Your Shohoz account number
-    # ACCOUNT_PASS: Your Shohoz account password
     ```
 
 4. **Start the server:**
